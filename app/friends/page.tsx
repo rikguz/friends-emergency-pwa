@@ -29,44 +29,56 @@ export default function FriendsPage() {
     return friends.filter((f) => (f.full_name ?? "").toLowerCase().includes(q));
   }, [friends, query]);
 
-  useEffect(() => {
-    async function load() {
-      setErrorMsg(null);
-	
-	const userEmail = sessionData.session.user.email;
+useEffect(() => {
+  async function load() {
+    setErrorMsg(null);
 
-	const { data: allowed, error: allowedError } = await supabase
-  	.from("allowed_users")
- 	 .select("email, is_active")
-  	.eq("email", userEmail)
-  	.eq("is_active", true)
-  	.maybeSingle();
-
-	if (allowedError || !allowed) {
- 	 await supabase.auth.signOut();
- 	 router.replace("/unauthorized");
- 	 return;
-	}
-
-      const { data, error } = await supabase
-        .from("friends")
-        .select(
-          "id, full_name, phone, address, emergency_name, emergency_phone, email, car_plates, car_info"
-        )
-        .order("full_name", { ascending: true });
-
-      if (error) {
-        setErrorMsg(error.message);
-        setLoading(false);
-        return;
-      }
-
-      setFriends((data ?? []) as Friend[]);
-      setLoading(false);
+    // 1) Sesión
+    const { data: sessionData, error: sessionErr } = await supabase.auth.getSession();
+    if (sessionErr) {
+      setErrorMsg(sessionErr.message);
+      return;
     }
 
-    load();
-  }, [router]);
+    if (!sessionData?.session) {
+      router.replace("/login");
+      return;
+    }
+
+    // 2) Allowlist
+    const userEmail = sessionData.session.user.email;
+
+    const { data: allowed, error: allowedError } = await supabase
+      .from("allowed_users")
+      .select("email, is_active")
+      .eq("email", userEmail)
+      .eq("is_active", true)
+      .maybeSingle();
+
+    if (allowedError || !allowed) {
+      await supabase.auth.signOut();
+      router.replace("/unauthorized");
+      return;
+    }
+
+    // 3) Cargar contactos
+    const { data, error } = await supabase
+      .from("friends")
+      .select(
+        "id, full_name, phone, address, emergency_name, emergency_phone, email, car_plates, car_info"
+      )
+      .order("full_name", { ascending: true });
+
+    if (error) {
+      setErrorMsg(error.message);
+      return;
+    }
+
+    setFriends(data ?? []);
+  }
+
+  load();
+}, [router]);
 
   async function signOut() {
     await supabase.auth.signOut();
