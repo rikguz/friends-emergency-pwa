@@ -32,12 +32,21 @@ export default function FriendsPage() {
   useEffect(() => {
     async function load() {
       setErrorMsg(null);
+	
+	const userEmail = sessionData.session.user.email;
 
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session) {
-        router.replace("/login");
-        return;
-      }
+	const { data: allowed, error: allowedError } = await supabase
+  	.from("allowed_users")
+ 	 .select("email, is_active")
+  	.eq("email", userEmail)
+  	.eq("is_active", true)
+  	.maybeSingle();
+
+	if (allowedError || !allowed) {
+ 	 await supabase.auth.signOut();
+ 	 router.replace("/unauthorized");
+ 	 return;
+	}
 
       const { data, error } = await supabase
         .from("friends")
