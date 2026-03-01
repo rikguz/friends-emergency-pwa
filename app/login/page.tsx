@@ -17,11 +17,17 @@ export default function LoginPage() {
   const [msg, setMsg] = useState<string>("");
 
   useEffect(() => {
-    // si ya tiene sesión, vámonos a friends
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) router.replace("/friends");
-    });
-  }, [router]);
+  supabase.auth.getSession().then(({ data }) => {
+    const pinOk =
+      typeof window !== "undefined" &&
+      localStorage.getItem("pin_ok") === "true";
+
+    // Solo manda a /friends si ya pasó el PIN antes
+    if (data.session && pinOk) {
+      router.replace("/friends");
+    }
+  });
+}, [router]);
 
   async function enterWithPin() {
     setMsg("");
