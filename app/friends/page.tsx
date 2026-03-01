@@ -50,21 +50,6 @@ if (!pinOk) {
       return;
     }
 
-    // 2) Allowlist
-    const userEmail = sessionData.session.user.email;
-
-    const { data: allowed, error: allowedError } = await supabase
-      .from("allowed_users")
-      .select("email, is_active")
-      .eq("email", userEmail)
-      .eq("is_active", true)
-      .maybeSingle();
-
-    if (allowedError || !allowed) {
-      await supabase.auth.signOut();
-      router.replace("/unauthorized");
-      return;
-    }
 
     // 3) Cargar contactos
     const { data, error } = await supabase
