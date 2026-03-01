@@ -33,6 +33,11 @@ useEffect(() => {
   async function load() {
     setErrorMsg(null);
 
+const pinOk = typeof window !== "undefined" && localStorage.getItem("pin_ok") === "true";
+if (!pinOk) {
+  router.replace("/login");
+  return;
+}
     // 1) Sesión
     const { data: sessionData, error: sessionErr } = await supabase.auth.getSession();
     if (sessionErr) {
