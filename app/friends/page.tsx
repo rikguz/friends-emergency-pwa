@@ -94,19 +94,27 @@ if (!pinOk) {
         onChange={(e) => setQuery(e.target.value)}
       />
 
-      {loading ? (
 {errorMsg && (
   <div className="mt-4 rounded-xl border p-3 text-sm">
     Error: {errorMsg}
   </div>
 )}
-	{loading && <p>Cargando...</p>}
-        <p className="mt-6">Cargando…</p>
-      ) : errorMsg ? (
-        <p className="mt-6 text-red-600">Error: {errorMsg}</p>
-      ) : filtered.length === 0 ? (
-        <p className="mt-6">No hay registros.</p>
-      ) : (
+	{loading && <p className="mt-6">Cargando...</p>}
+
+	{!loading && !errorMsg && filtered.length === 0 && (
+	  <p className="mt-6">No hay registros.</p>
+	)}
+
+{!loading && !errorMsg && (
+  <ul className="mt-6 space-y-3">
+    {filtered.map((f) => (
+      <li key={f.id} className="rounded-2xl border p-4">
+        {/* aquí va tu tarjeta de contacto tal como la tienes */}
+      </li>
+    ))}
+  </ul>
+)}        
+
         <ul className="mt-6 space-y-3">
           {filtered.map((f) => (
             <li key={f.id} className="rounded-2xl border p-4">
@@ -169,7 +177,7 @@ if (!pinOk) {
             </li>
           ))}
         </ul>
-      )}
+      
     </main>
   );
 }
