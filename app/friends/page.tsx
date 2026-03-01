@@ -104,16 +104,7 @@ if (!pinOk) {
 	{!loading && !errorMsg && filtered.length === 0 && (
 	  <p className="mt-6">No hay registros.</p>
 	)}
-
-{!loading && !errorMsg && (
-  <ul className="mt-6 space-y-3">
-    {filtered.map((f) => (
-      <li key={f.id} className="rounded-2xl border p-4">
-        {/* aquí va tu tarjeta de contacto tal como la tienes */}
-      </li>
-    ))}
-  </ul>
-)}        
+       
 
         <ul className="mt-6 space-y-3">
           {filtered.map((f) => (
