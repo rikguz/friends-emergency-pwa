@@ -31,6 +31,7 @@ export default function FriendsPage() {
 
 useEffect(() => {
   async function load() {
+    setLoading(true);
     setErrorMsg(null);
 
 const pinOk = typeof window !== "undefined" && localStorage.getItem("pin_ok") === "true";
@@ -61,10 +62,12 @@ if (!pinOk) {
 
     if (error) {
       setErrorMsg(error.message);
+      setLoading(false);
       return;
     }
 
     setFriends(data ?? []);
+	setLoading(false);
   }
 
   load();
@@ -92,6 +95,12 @@ if (!pinOk) {
       />
 
       {loading ? (
+{errorMsg && (
+  <div className="mt-4 rounded-xl border p-3 text-sm">
+    Error: {errorMsg}
+  </div>
+)}
+	{loading && <p>Cargando...</p>}
         <p className="mt-6">Cargando…</p>
       ) : errorMsg ? (
         <p className="mt-6 text-red-600">Error: {errorMsg}</p>
